@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎁 操行分前12名 抽奖</title>
+<style>
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family:"微软雅黑",sans-serif;
+    }
+    body{
+        background:linear-gradient(140deg,#ffd1e0,#bde0fe);
+        min-height:100vh;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        padding:40px 20px;
+    }
+    .title{
+        font-size:44px;
+        color:#ff5777;
+        font-weight:bold;
+        margin-bottom:10px;
+        text-shadow:1px 1px 3px rgba(0,0,0,0.1);
+    }
+    .sub{
+        font-size:24px;
+        color:#555;
+        margin-bottom:30px;
+    }
+    .remain{
+        font-size:26px;
+        background:#ff8fab;
+        color:white;
+        padding:10px 25px;
+        border-radius:50px;
+        margin-bottom:40px;
+    }
+    .show{
+        width:550px;
+        height:200px;
+        background:white;
+        border-radius:25px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:60px;
+        font-weight:bold;
+        color:#333;
+        border:6px solid #ffb3c1;
+        box-shadow:0 6px 16px rgba(0,0,0,0.1);
+        margin-bottom:40px;
+    }
+    .btn-box{
+        display:flex;
+        gap:20px;
+    }
+    .btn{
+        font-size:30px;
+        padding:16px 45px;
+        border:none;
+        border-radius:50px;
+        cursor:pointer;
+        box-shadow:0 5px 10px rgba(0,0,0,0.1);
+    }
+    .start-btn{
+        background:#4cd964;
+        color:white;
+    }
+    .reset-btn{
+        background:#5ac8fa;
+        color:white;
+    }
+    .btn:active{
+        transform:translateY(2px);
+    }
+    .btn:disabled{
+        background:#ccc;
+    }
+</style>
+</head>
+<body>
+
+<div class="title">🎁 操行分前12名 抽奖</div>
+<div class="sub">公平抽奖 · 奖品抽完即止</div>
+<div class="remain" id="remain">剩余抽奖：12 次</div>
+
+<div class="show" id="show">准备抽奖</div>
+<div class="btn-box">
+    <button class="btn start-btn" id="start">开始抽奖</button>
+    <button class="btn reset-btn" id="reset">重新开始</button>
+</div>
+
+<script>
+    // 原始全部奖品列表（用于全程滚动展示）
+    const allPrizeList = [
+        "泡面","泡面",
+        "笔","笔","笔",
+        "辣条","辣条",
+        "薯片","薯片",
+        "饮料","饮料","饮料"
+    ];
+    // 实际可抽取奖品池
+    let prizePool = [...allPrizeList];
+    let remain = 12;
+    let rolling = false;
+    let timer;
+
+    const show = document.getElementById("show");
+    const start = document.getElementById("start");
+    const reset = document.getElementById("reset");
+    const remainText = document.getElementById("remain");
+
+    function updateRemain() {
+        remainText.innerText = "剩余抽奖：" + remain + " 次";
+    }
+
+    // 滚动时永远展示完整原始奖品，保证画面一致
+    function roll() {
+        let r = Math.floor(Math.random() * allPrizeList.length);
+        show.innerText = allPrizeList[r];
+    }
+
+    // 开始抽奖
+    start.onclick = function() {
+        if(rolling || remain === 0) return;
+
+        rolling = true;
+        start.disabled = true;
+        timer = setInterval(roll, 100);
+
+        setTimeout(() => {
+            clearInterval(timer);
+            // 从实际奖池抽取最终奖品
+            let idx = Math.floor(Math.random() * prizePool.length);
+            let win = prizePool[idx];
+            prizePool.splice(idx, 1);
+            show.innerText = "🎉 恭喜抽中：" + win;
+            remain--;
+            updateRemain();
+            rolling = false;
+            start.disabled = false;
+
+            // 最后一轮，停留5秒再提示结束
+            if(remain === 0){
+                setTimeout(()=>{
+                    show.innerText = "🎊 全部抽奖完毕！";
+                },5000);
+            }
+        }, 2000);
+    }
+
+    // 重新开始重置所有数据
+    reset.onclick = function(){
+        clearInterval(timer);
+        prizePool = [...allPrizeList];
+        remain = 12;
+        show.innerText = "准备抽奖";
+        updateRemain();
+        rolling = false;
+        start.disabled = false;
+    }
+
+    updateRemain();
+</script>
+</body>
+</html>
